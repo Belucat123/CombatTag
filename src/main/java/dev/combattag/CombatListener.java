@@ -8,11 +8,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
+import org.bukkit.event.entity.FireworkExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 
 public class CombatListener implements Listener {
 
@@ -46,13 +49,34 @@ public class CombatListener implements Listener {
         manager.cleanUp(event.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND && event.getHand() != EquipmentSlot.OFF_HAND) return;
         Player player = event.getPlayer();
         if (!manager.isTagged(player.getUniqueId())) return;
         ItemStack item = event.getItem();
         if (item == null || item.getType() != Material.FIREWORK_ROCKET) return;
+        if (!player.isGliding()) return;
+        event.setCancelled(true);
+        player.sendMessage(
+            Component.text("⚔ ", NamedTextColor.RED)
+                .append(Component.text("You cannot use fireworks while in combat!", NamedTextColor.YELLOW))
+        );
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onFireworkExplode(FireworkExplodeEvent event) {
+        if (!(event.getEntity().getShooter() instanceof Player player)) return;
+        if (!manager.isTagged(player.getUniqueId())) return;
+        if (!player.isGliding()) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onFireworkSpawn(org.bukkit.event.entity.EntitySpawnEvent event) {
+        if (!(event.getEntity() instanceof Firework firework)) return;
+        if (!(firework.getShooter() instanceof Player player)) return;
+        if (!manager.isTagged(player.getUniqueId())) return;
         if (!player.isGliding()) return;
         event.setCancelled(true);
         player.sendMessage(

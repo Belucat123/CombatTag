@@ -1,0 +1,20 @@
+name: CombatTag
+version: 1.0.0
+main: dev.combattag.CombatTag
+api-version: '1.21'
+description: PvP combat tagging system.
+author: CombatTag
+
+commands:
+  combattag:
+    description: CombatTag admin commands
+    usage: /combattag reload
+    permission: combattag.admin
+
+permissions:
+  combattag.admin:
+    description: Access to CombatTag admin commands
+    default: op
+  combattag.bypass:
+    description: Bypass combat tag
+    default: false

@@ -1,0 +1,3 @@
+combat-duration: 20
+action-bar-prefix: "Combat"
+tag-on-projectile: true
